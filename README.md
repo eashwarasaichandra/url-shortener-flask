@@ -60,7 +60,7 @@ python test_api.py
 - `GET /analytics/<short_code>`: Retrieve click data and timestamps.
 
 ## 🖼️ UI Preview
-![LinkSwift UI](https://via.placeholder.com/800x450?text=LinkSwift+Premium+UI)
+![LinkSwift UI](screenshot.png)
 
 ## 📄 License
 This project is open-source and available under the [MIT License](LICENSE).
