@@ -1,6 +1,6 @@
 # LinkSwift - Premium URL Shortener API
 
-LinkSwift is a high-performance, low-latency URL shortener service built with Flask and SQLAlchemy. It features a modern glassmorphism UI, real-time analytics, and production-grade engineering like idempotent shortening and atomic click tracking.
+LinkSwift is a production-grade URL shortener service built using Flask and SQLAlchemy. It enables low-latency redirection, idempotent URL generation, and real-time analytics, designed with backend engineering best practices.
 
 ## 🚀 Features
 - **Fast Lookups**: Indexed database queries for near-instant redirection.
