@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkSwift | Premium URL Shortener</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #22d3ee;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .background-blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+            top: -100px;
+            right: -100px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem;
+            border-radius: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .result-card {
+            margin-top: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            display: none;
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-url {
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin: 1rem 0;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .features {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-item {
+            text-align: left;
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-blob"></div>
+    
+    <div class="container">
+        <h1>LinkSwift</h1>
+        <p class="subtitle">Shorten your links with blazing fast, low-latency redirection and powerful analytics.</p>
+
+        <div class="input-group">
+            <input type="text" id="urlInput" placeholder="Paste your long URL here...">
+            <button id="shortenBtn">
+                <span id="btnText">Shorten</span>
+                <div class="loading-spinner" id="spinner"></div>
+            </button>
+        </div>
+
+        <div class="result-card" id="resultCard">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Your swift link is ready:</p>
+            <div class="result-url" id="shortUrl"></div>
+            <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+            <p id="idempotencyInfo" style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent); display: none;"></p>
+        </div>
+
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon">⚡ Low Latency</div>
+                <div class="feature-title">Fast Redirection</div>
+                <div class="feature-desc">Indexed lookups ensure minimal delay.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📊 Analytics</div>
+                <div class="feature-title">Real-time Insights</div>
+                <div class="feature-desc">Track clicks and engagement instantly.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🛡️ Secure</div>
+                <div class="feature-title">Clean & Safe</div>
+                <div class="feature-desc">Robust validation and sanitization.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const shortenBtn = document.getElementById('shortenBtn');
+        const urlInput = document.getElementById('urlInput');
+        const resultCard = document.getElementById('resultCard');
+        const shortUrlDisplay = document.getElementById('shortUrl');
+        const copyBtn = document.getElementById('copyBtn');
+        const btnText = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        const idempotencyInfo = document.getElementById('idempotencyInfo');
+
+        shortenBtn.addEventListener('click', async () => {
+            const url = urlInput.value;
+            if (!url) return;
+
+            // Show loading
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            shortenBtn.disabled = true;
+
+            try {
+                const response = await fetch('/shorten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    shortUrlDisplay.innerText = data.short_url;
+                    resultCard.style.display = 'block';
+                    
+                    if (!data.created) {
+                        idempotencyInfo.innerText = "✨ Reused existing short link (Idempotent)";
+                        idempotencyInfo.style.display = 'block';
+                    } else {
+                        idempotencyInfo.style.display = 'none';
+                    }
+                } else {
+                    alert(data.error || 'Something went wrong');
+                }
+            } catch (error) {
+                alert('Error connecting to server');
+            } finally {
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+                shortenBtn.disabled = false;
+            }
+        });
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(shortUrlDisplay.innerText);
+            copyBtn.innerText = 'Copied!';
+            setTimeout(() => {
+                copyBtn.innerText = 'Copy to Clipboard';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
